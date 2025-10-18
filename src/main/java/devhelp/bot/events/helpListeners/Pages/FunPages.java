@@ -4,18 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import devhelp.bot.config.util.EmbedTemplate;
-import devhelp.bot.events.helpListeners.HelpInteractionListener;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
-public class FunPages {
+public class FunPages implements IPages {
   private static final Map<String, MessageEmbed> pages = new HashMap<>();
-  private static String choice = new HelpInteractionListener().getChoice();
   static{
-    pages.put("memePages", new EmbedTemplate().embedInfo(null,
+    pages.put("memes", new EmbedTemplate().embedInfo(null,
         """
             # Comando de Memes
             > Aqui estão os comandos para memes:
@@ -23,6 +20,13 @@ public class FunPages {
             Caso queira um meme novo, basta usar o comando novamente. Alem disso, o meme possui dois botões: 
             > **Like**: para curtir o meme.
             > **Views**: para ver quantas vezes o meme foi visualizado.
+            """, null));
+    pages.put("coinflip", new EmbedTemplate().embedInfo(null,
+        """
+            # Comando de Coinflip
+            > Aqui estão os comandos para coinflip:
+            ``/coinflip`` - **Comando para girar a moeda!**
+            Caso queira girar a moeda novamente, basta usar o comando novamente. Alem disso, o coinflip possui dois botões: 
             """, null));
   }
 
@@ -38,14 +42,8 @@ public class FunPages {
     try{
       return StringSelectMenu.create("fun-menu")
       .setPlaceholder("Selecione um comando!")
-      .addOptions(
-        SelectOption.of("memes", "memes")
-          .withDescription("Acesse comandos voltados para memes.")
-          .withDefault("memes".equals(selected)),
-        SelectOption.of("coinflip", "coinflip")
-          .withDescription("Acesse comandos voltados para coinflip.")
-          .withDefault("coinflip".equals(selected))
-      )
+      .addOption("Memes", "memes", "Acesse comandos voltados para memes.")
+      .addOption("Coinflip", "coinflip", "Acesse comandos sobre o coinflip.")
       .build();
     } catch (Exception e){
       throw new RuntimeException(e);
@@ -53,21 +51,24 @@ public class FunPages {
   }
 
   public static void optionsFun(StringSelectInteractionEvent event){
+    String choice = event.getValues().get(0);
     switch (choice) {
-      case "memes" -> createEmbedPage(event);
+      case "memes" -> createEmbedPage(event, choice);
+      case "coinflip" -> createEmbedPage(event, choice);
       default -> event.editMessageEmbeds(
         new EmbedTemplate().embedError("❌ Erro", "Opção inválida!", null)
       ).queue();
     }
   }
 
-  public static void createEmbedPage(StringSelectInteractionEvent event){
+  public static void createEmbedPage(StringSelectInteractionEvent event, String choice){
     event.editMessageEmbeds(
         getPage(choice)
       ).setComponents(
         ActionRow.of(
-          getSelectFunMenu(choice)
-        )
+          HelpPages.getSelectHelpMenu("Diversão")
+        ),
+        ActionRow.of(getSelectFunMenu(choice))
       ).queue();
   }
 }

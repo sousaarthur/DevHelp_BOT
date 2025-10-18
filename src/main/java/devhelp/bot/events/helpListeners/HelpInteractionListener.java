@@ -1,6 +1,9 @@
 package devhelp.bot.events.helpListeners;
+import com.mongodb.internal.client.model.Util;
+
 import devhelp.bot.events.helpListeners.Pages.FunPages;
 import devhelp.bot.events.helpListeners.Pages.HelpPages;
+import devhelp.bot.events.helpListeners.Pages.UtilityPages;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -15,6 +18,7 @@ public class HelpInteractionListener extends ListenerAdapter {
     switch (componentId) {
       case "command-menu" -> HelpPages.optionsHelp(event);
       case "fun-menu" -> FunPages.optionsFun(event);
+      case "command-utility" -> UtilityPages.optionsUtility(event);
       default -> {}
     }
     } catch(Exception e){

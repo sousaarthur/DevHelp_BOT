@@ -5,7 +5,6 @@ import java.util.Map;
 
 import devhelp.bot.config.util.Colors;
 import devhelp.bot.config.util.EmbedTemplate;
-import devhelp.bot.events.helpListeners.HelpInteractionListener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -13,9 +12,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
-public class HelpPages {
+public class HelpPages implements IPages {
   private static final Map<String, MessageEmbed> pages = new HashMap<>();
-  private static String choice = new HelpInteractionListener().getChoice();
 
   static {
     pages.put("menu", new EmbedTemplate().embedInfo(null,
@@ -46,19 +44,29 @@ public class HelpPages {
             """, null));
     pages.put("Diversão", new EmbedTemplate().embedInfo(null,
         """
-            # 📚 Comandos de Diversão
+            # 🕹️ Comandos de Diversão
             > Aqui estão os comandos para diversão:
             ``/memes`` - Comando para gerar memes aleatório de programação!
             ``/coinflip`` - Comando para girar a moeda!
             """, null));
     pages.put("Iniciante", new EmbedTemplate().embedInfo(null,
         """
-            # 📚 Comandos para Iniciante
+            # 🧑‍💻 Comandos para Iniciante
             > Aqui estão os comandos para iniciante:
             ``/languages`` - Comando para exibir informações sobre linguagens de programação!
             ``/roadmap`` - Comando para exibir roadmaps de aprendizado!
             ``/git`` - Comando para exibir comandos git!
             """, null));
+    pages.put("Utilidades", new EmbedTemplate().embedInfo(null,
+      """
+          # 🎯 Comandos de Utilidades
+          > Aqui estão os comandos de utilidades:
+          ``/profile`` - Comando para exibir informações e alterar dados do perfil!
+          ``/github`` - Comando para para exibir a Streak de commits do GitHub!
+          ``/level`` - Comando para exibir o level e o xp do(s) usuário(s)!
+          ``/rank`` - Comando para exibir o top rank do(s) usuário(s)!
+      """,
+    null));
   }
 
   public static MessageEmbed getPage(String key) {
@@ -81,6 +89,9 @@ public class HelpPages {
           SelectOption.of("Iniciante 👨‍💻", "Iniciante")
             .withDescription("Obtenha orientações para começar na programação")
             .withDefault("Iniciante".equals(selected)),
+          SelectOption.of("Utilidades 🎯", "Utilidades")
+            .withDescription("Explore ferramentas úteis para desenvolvedores")
+            .withDefault("Utilidades".equals(selected)),
           SelectOption.of("Menu 💾", "Menu")
             .withDescription("Volte ao menu principal")
             .withDefault("Menu".equals(selected))
@@ -88,7 +99,8 @@ public class HelpPages {
   }
 
   public static void optionsHelp(StringSelectInteractionEvent event){
-        switch (event.getValues().get(0)) {
+      String choice = event.getValues().get(0);
+      switch (choice) {
       case "Estudos" -> event.editMessageEmbeds(
         getPage("Estudos")
       ).setComponents(
@@ -112,8 +124,15 @@ public class HelpPages {
             getSelectHelpMenu(choice)
           ),
           ActionRow.of(
-            BeginnerPages.getSelectBeginnerMenu()
           )
+      ).queue();
+      case "Utilidades" -> event.editMessageEmbeds(getPage("Utilidades")).setComponents(
+        ActionRow.of(
+          getSelectHelpMenu(choice)
+        ),
+        ActionRow.of(
+          UtilityPages.getSelectUtilityMenu(choice)
+        )
       ).queue();
       case "Menu" -> event.editMessageEmbeds(
           HelpPages.getPage("menu")

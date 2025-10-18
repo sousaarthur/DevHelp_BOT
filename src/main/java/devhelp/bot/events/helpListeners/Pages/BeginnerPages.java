@@ -7,7 +7,7 @@ import devhelp.bot.config.util.EmbedTemplate;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 
-public class BeginnerPages {
+public class BeginnerPages implements IPages {
   private static final Map<String, MessageEmbed> pages = new HashMap<>();
 
   static{
